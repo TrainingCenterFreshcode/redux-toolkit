@@ -1,9 +1,13 @@
 import Counter from "./components/Counter/Counter";
+import Header from "./components/Header/Header";
 
 
 function App() {
   return (
-    <Counter />
+    <>
+      <Header/>
+      <Counter />
+    </>
   );
 }
 
