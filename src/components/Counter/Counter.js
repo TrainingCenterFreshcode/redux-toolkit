@@ -1,12 +1,15 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { increment, decrement, setStep } from '../../store/slices/counterSlice';
-import { setLang } from '../../store/slices/langSlice';
+import * as counterActionCreators from '../../store/slices/counterSlice';
+import * as langActionCreators from '../../store/slices/langSlice';
 import CONSTANTS from '../../constants';
 import styles from './Counter.module.scss';
 import cx from 'classnames';
 import { bindActionCreators } from '@reduxjs/toolkit';
-const { LANGUAGE: { EN_US, UA_UA, PL_PL, DE_DE }, THEMES } = CONSTANTS;
+const {
+  LANGUAGE: { EN_US, UA_UA, PL_PL, DE_DE },
+  THEMES,
+} = CONSTANTS;
 
 const translations = new Map([
   [
@@ -15,33 +18,36 @@ const translations = new Map([
       countText: 'Count',
       stepText: 'Step',
       incrementText: 'Increment',
-      decrementText: 'Decrement'
-    }
-  ], [
+      decrementText: 'Decrement',
+    },
+  ],
+  [
     UA_UA,
     {
       countText: 'Значення лічильнику',
       stepText: 'Крок',
       incrementText: 'Збільшити значення',
-      decrementText: 'Зменшити значення'
-    }
-  ], [
+      decrementText: 'Зменшити значення',
+    },
+  ],
+  [
     PL_PL,
     {
       countText: 'znaczenie licznika',
       stepText: 'ustawić krok',
       incrementText: 'zwiększać',
-      decrementText: 'zmniejszać'
-    }
-  ], [
+      decrementText: 'zmniejszać',
+    },
+  ],
+  [
     DE_DE,
     {
       countText: 'Der Wert des Zählers',
       stepText: 'Gegenschritt',
       incrementText: 'Erhöhen Sie den Zähler',
-      decrementText: 'Verringern Sie den Zähler'
-    }
-  ]
+      decrementText: 'Verringern Sie den Zähler',
+    },
+  ],
 ]);
 
 const Counter = (props) => {
@@ -50,7 +56,10 @@ const Counter = (props) => {
   const { count, step } = useSelector((state) => state.counter);
   const dispatch = useDispatch();
 
-  const actionCreators = bindActionCreators({ setLang, setStep, increment, decrement }, dispatch);
+  const { setStep, setLang, increment, decrement } = bindActionCreators(
+    { ...counterActionCreators, ...langActionCreators },
+    dispatch
+  );
 
   const translation = translations.get(language);
 
@@ -58,29 +67,38 @@ const Counter = (props) => {
 
   const className = cx({
     [styles.darkTheme]: theme === THEMES.DARK,
-    [styles.lightTheme]: theme === THEMES.LIGHT
+    [styles.lightTheme]: theme === THEMES.LIGHT,
   });
 
   return (
     <div className={className}>
-      <select value={language} onChange={({ target: { value } }) => actionCreators.setLang(value)}>
+      <select
+        value={language}
+        onChange={({ target: { value } }) => setLang(value)}
+      >
         <option value={EN_US}>English</option>
         <option value={UA_UA}>Ukrainian</option>
         <option value={DE_DE}>Deutch</option>
         <option value={PL_PL}>Polska</option>
       </select>
 
-      <p>{countText}: {count}</p>
+      <p>
+        {countText}: {count}
+      </p>
       <label>
         {stepText}
         <input
           type="number"
           value={step}
-          onChange={({ target: { value } }) => actionCreators.setStep(value)}
+          onChange={({ target: { value } }) => setStep(value)}
         />
       </label>
-      <button onClick={() => actionCreators.increment()}>{incrementText}</button>
-      <button onClick={() => actionCreators.decrement()}>{decrementText}</button>
+      <button onClick={() => increment()}>
+        {incrementText}
+      </button>
+      <button onClick={() => decrement()}>
+        {decrementText}
+      </button>
     </div>
   );
 };
