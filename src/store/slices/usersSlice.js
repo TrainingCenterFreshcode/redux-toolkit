@@ -3,13 +3,16 @@ import * as API from 'api';
 
 const SLICE_NAME = 'users';
 
-const getUsers = createAsyncThunk(`${SLICE_NAME}/getUsers`, async (arg) => {
-  console.log(`arg is ${arg}`);
-  return API.getUsers();
+const getUsers = createAsyncThunk(`${SLICE_NAME}/getUsers`, async (arg, thunkAPI) => {
+  try {
+    const { data: users } = await API.getUsers(); // users/getUsers/fullfiled
+
+    return users;
+  } catch (error) {
+    console.log(error);
+    return thunkAPI.rejectWithValue(error.message); // users/getUsers/rejected
+  }
 });
-// users/getUsers/fullfiled
-// users/getUsers/pending
-// users/getUsers/rejected
 
 const initialState = {
   users: [],
@@ -27,6 +30,10 @@ const usersSlice = createSlice({
     builder.addCase(getUsers.fulfilled, (state, action) => {
       state.isLoading = false;
       state.users = action.payload;
+    });
+    builder.addCase(getUsers.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
     });
   }
 });
